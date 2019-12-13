@@ -14,11 +14,20 @@ class Application(tk.Frame):
         self.hi_there["command"] = self.say_hi
         self.hi_there.pack(side="top")
 
+        self.txt_input = tk.Entry(self)
+        self.txt_input.pack()
+
+        self.send_btn = tk.Button(self, text="Send", fg="green", command=self.send_btn)
+        self.send_btn.pack()
+
         self.quit = tk.Button(self, text="QUIT", fg="red", command=self.master.destroy)
         self.quit.pack(side="bottom")
 
     def say_hi(self):
         print("hi there, everyone!")
+
+    def send_btn(self):
+        print("msg send stub.")
 
 
 root = tk.Tk()
