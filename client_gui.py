@@ -103,9 +103,9 @@ class CWidget(QWidget):
                 self.recvmsg.clear()
                 self.btn.setText('접속')
         else:
-            print("접속 종료 버튼")
+            sendmsg = "exit"
+            self.c.send(sendmsg)
             self.c.stop()
-            print("도달못해")
             self.sendmsg.clear()
             self.recvmsg.clear()
             self.btn.setText('접속')
@@ -113,7 +113,7 @@ class CWidget(QWidget):
     def updateMsg(self, msg):
         self.recvmsg.addItem(QListWidgetItem(msg))
 
-    def updateDisconnect(self):
+    def update_disconnect(self):
         self.btn.setText('접속')
 
     def sendMsg(self):

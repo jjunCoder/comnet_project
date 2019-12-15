@@ -81,6 +81,8 @@ class ServerSocket:
                     self.send(msg)
                     self.recv.recv_signal.emit(msg)
                     print('[RECV]:', addr, msg)
+                    if msg == "exit":
+                        break
 
         self.remove_client(addr, client)
 
