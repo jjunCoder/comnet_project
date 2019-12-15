@@ -44,7 +44,7 @@ class CWidget(QWidget):
         box.addWidget(self.port)
 
         self.btn = QPushButton('접속')
-        self.btn.clicked.connect(self.connectClicked)
+        self.btn.clicked.connect(self.connect_clicked)
         box.addWidget(self.btn)
 
         gb.setLayout(box)
@@ -91,8 +91,8 @@ class CWidget(QWidget):
 
         self.show()
 
-    def connectClicked(self):
-        if self.c.bConnect == False:
+    def connect_clicked(self):
+        if not self.c.bConnect:
             ip = self.ip.text()
             port = self.port.text()
             if self.c.connectServer(ip, int(port)):
@@ -103,7 +103,9 @@ class CWidget(QWidget):
                 self.recvmsg.clear()
                 self.btn.setText('접속')
         else:
+            print("접속 종료 버튼")
             self.c.stop()
+            print("도달못해")
             self.sendmsg.clear()
             self.recvmsg.clear()
             self.btn.setText('접속')

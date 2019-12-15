@@ -65,7 +65,7 @@ class ServerSocket:
                 self.threads.append(t)
                 t.start()
 
-        self.removeAllClients()
+        self.remove_all_clients()
         self.server.close()
 
     def receive(self, addr, client):
@@ -82,7 +82,7 @@ class ServerSocket:
                     self.recv.recv_signal.emit(msg)
                     print('[RECV]:', addr, msg)
 
-        self.removeCleint(addr, client)
+        self.remove_client(addr, client)
 
     def send(self, msg):
         try:
@@ -91,12 +91,13 @@ class ServerSocket:
         except Exception as e:
             print('Send() Error : ', e)
 
-    def removeCleint(self, addr, client):
+    def remove_client(self, addr, client):
         client.close()
         self.ip.remove(addr)
         self.clients.remove(client)
 
         self.conn.conn_signal.emit()
+        print('remove client')
 
         i = 0
         for t in self.threads[:]:
@@ -104,9 +105,9 @@ class ServerSocket:
                 del (self.threads[i])
             i += 1
 
-        self.resourceInfo()
+        self.resource_info()
 
-    def removeAllClients(self):
+    def remove_all_clients(self):
         for c in self.clients:
             c.close()
 
@@ -116,9 +117,9 @@ class ServerSocket:
 
         self.conn.conn_signal.emit()
 
-        self.resourceInfo()
+        self.resource_info()
 
-    def resourceInfo(self):
+    def resource_info(self):
         print('Number of Client ip\t: ', len(self.ip))
         print('Number of Client socket\t: ', len(self.clients))
         print('Number of Client thread\t: ', len(self.threads))

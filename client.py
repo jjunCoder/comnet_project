@@ -42,11 +42,6 @@ class ClientSocket:
 
     def stop(self):
         self.bConnect = False
-        if hasattr(self, 'client'):
-            self.client.close()
-            del (self.client)
-            print('Client Stop')
-            self.disconn.disconn_signal.emit()
 
     def receive(self, client):
         while self.bConnect:
@@ -61,7 +56,10 @@ class ClientSocket:
                     self.recv.recv_signal.emit(msg)
                     print('[RECV]:', msg)
 
-        self.stop()
+        if hasattr(self, 'client'):
+            self.client.close()
+            del self.client
+            self.disconn.disconn_signal.emit()
 
     def send(self, msg):
         if not self.bConnect:
