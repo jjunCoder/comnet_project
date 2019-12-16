@@ -110,7 +110,7 @@ class ServerSocket:
         while True:
             try:
                 if c['hb'] is not True:
-                    print('client connection anomaly detected')
+                    self.send('client ip: ' + c['addr'] + ' is disconnected. Get out!!!')
                     break
                 else:
                     c['hb'] = False
