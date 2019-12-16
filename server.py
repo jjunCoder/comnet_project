@@ -110,7 +110,7 @@ class ServerSocket:
         while True:
             try:
                 if c['hb'] is not True:
-                    self.send('client ip: ' + c['addr'] + ' is disconnected. Get out!!!')
+                    self.send('client ip: ' + str(c['addr']) + ' is disconnected. Get out!!!')
                     break
                 else:
                     c['hb'] = False
