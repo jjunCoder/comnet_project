@@ -63,7 +63,7 @@ class ServerSocket:
                 print('Accept() Error : ', e)
                 break
             else:
-                item = {'client': client, 'hb': True}
+                item = {'client': client, 'hb': True, 'addr': addr}
                 self.clients.append(item)
                 self.ip.append(addr)
                 self.conn.conn_signal.emit()
@@ -110,6 +110,7 @@ class ServerSocket:
                 for c in self.clients:
                     if c['hb'] is not True:
                         print('client connection anomaly detected')
+                        self.remove_client(c['addr'], c['client'])
                         break
                     else:
                         c['hb'] = False
