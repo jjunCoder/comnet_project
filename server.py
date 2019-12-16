@@ -42,8 +42,6 @@ class ServerSocket:
             self.bListen = True
             self.t = Thread(target=self.listen, args=(self.server,))
             self.t.start()
-            self.heart_beat_t = Thread(target=self.heart_beat_send, args=())
-            self.heart_beat_t.start()
             print('Server Listening...')
 
         return True
@@ -70,6 +68,10 @@ class ServerSocket:
                 t = Thread(target=self.receive, args=(addr, client))
                 self.threads.append(t)
                 t.start()
+
+                heart_beat_t = Thread(target=self.heart_beat_send, args=(item,))
+                self.threads.append(heart_beat_t)
+                heart_beat_t.start()
 
         self.remove_all_clients()
         self.server.close()
@@ -104,28 +106,29 @@ class ServerSocket:
         except Exception as e:
             print('Send() Error : ', e)
 
-    def heart_beat_send(self):
-        while self.bListen:
+    def heart_beat_send(self, c):
+        while True:
             try:
-                for c in self.clients:
-                    if c['hb'] is not True:
-                        print('client connection anomaly detected')
-                        self.remove_client(c['addr'], c['client'])
-                        break
-                    else:
-                        c['hb'] = False
-                        c['client'].send('HEART_BEAT'.encode())
+                if c['hb'] is not True:
+                    print('client connection anomaly detected')
+                    break
+                else:
+                    c['hb'] = False
+                    c['client'].send('HEART_BEAT'.encode())
             except Exception as e:
                 print('HEART_BEAT Error : ', e)
                 break
             else:
                 time.sleep(1)
 
+        self.remove_client(c['addr'], c['client'])
+
     def remove_client(self, addr, client):
         client.close()
-        self.ip.remove(addr)
+        if addr in self.ip:
+            self.ip.remove(addr)
         for c in self.clients:
-            if c['client'] is client:
+            if c['client'] is client and c in self.clients:
                 self.clients.remove(c)
         # self.clients.remove(client)
 
