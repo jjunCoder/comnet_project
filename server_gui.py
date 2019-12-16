@@ -37,7 +37,6 @@ class CWidget(QWidget):
         default_ip = str(netifaces.ifaddresses('en0')[netifaces.AF_INET][0]['addr'])
         # self.ip = QLineEdit(socket.gethostbyname(socket.gethostname()))
         self.ip = QLineEdit(default_ip)
-        print(type(self.ip))
         box.addWidget(label)
         box.addWidget(self.ip)
 

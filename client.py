@@ -53,8 +53,11 @@ class ClientSocket:
             else:
                 msg = str(recv, encoding='utf-8')
                 if msg:
-                    self.recv.recv_signal.emit(msg)
-                    print('[RECV]:', msg)
+                    if msg == 'HEART_BEAT':
+                        self.send('HEART_BEAT_ACK')
+                    else:
+                        self.recv.recv_signal.emit(msg)
+                        print('[RECV]:', msg)
 
         if hasattr(self, 'client'):
             self.client.close()

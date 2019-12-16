@@ -3,6 +3,8 @@ from threading import *
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
+import time
+
 
 class Signal(QObject):
     conn_signal = pyqtSignal()
@@ -23,6 +25,7 @@ class ServerSocket:
 
         self.conn.conn_signal.connect(self.parent.updateClient)
         self.recv.recv_signal.connect(self.parent.updateMsg)
+        self.heart_beat_ack = False
 
     def __del__(self):
         self.stop()
@@ -39,6 +42,8 @@ class ServerSocket:
             self.bListen = True
             self.t = Thread(target=self.listen, args=(self.server,))
             self.t.start()
+            self.heart_beat_t = Thread(target=self.heart_beat_send, args=())
+            self.heart_beat_t.start()
             print('Server Listening...')
 
         return True
@@ -58,7 +63,8 @@ class ServerSocket:
                 print('Accept() Error : ', e)
                 break
             else:
-                self.clients.append(client)
+                item = {'client': client, 'hb': True}
+                self.clients.append(item)
                 self.ip.append(addr)
                 self.conn.conn_signal.emit()
                 t = Thread(target=self.receive, args=(addr, client))
@@ -77,26 +83,50 @@ class ServerSocket:
                 break
             else:
                 msg = str(recv, encoding='utf-8')
-                if msg:
+                if msg and msg != 'HEART_BEAT_ACK':
                     self.send(msg)
                     self.recv.recv_signal.emit(msg)
                     print('[RECV]:', addr, msg)
                     if msg == "exit":
                         break
+                elif msg and msg == 'HEART_BEAT_ACK':
+                    for c in self.clients:
+                        if c['client'] is client:
+                            c['hb'] = True
+                            print('heart_beat_ack incoming')
 
         self.remove_client(addr, client)
 
     def send(self, msg):
         try:
             for c in self.clients:
-                c.send(msg.encode())
+                c['client'].send(msg.encode())
         except Exception as e:
             print('Send() Error : ', e)
+
+    def heart_beat_send(self):
+        while self.bListen:
+            try:
+                for c in self.clients:
+                    if c['hb'] is not True:
+                        print('client connection anomaly detected')
+                        break
+                    else:
+                        c['hb'] = False
+                        c['client'].send('HEART_BEAT'.encode())
+            except Exception as e:
+                print('HEART_BEAT Error : ', e)
+                break
+            else:
+                time.sleep(1)
 
     def remove_client(self, addr, client):
         client.close()
         self.ip.remove(addr)
-        self.clients.remove(client)
+        for c in self.clients:
+            if c['client'] is client:
+                self.clients.remove(c)
+        # self.clients.remove(client)
 
         self.conn.conn_signal.emit()
         print('remove client')
@@ -111,7 +141,7 @@ class ServerSocket:
 
     def remove_all_clients(self):
         for c in self.clients:
-            c.close()
+            c['client'].close()
 
         self.ip.clear()
         self.clients.clear()
