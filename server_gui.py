@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import socket
 import sys
 
@@ -5,6 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 import server
+import netifaces
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -31,7 +34,10 @@ class CWidget(QWidget):
         box = QHBoxLayout()
 
         label = QLabel('Server IP')
-        self.ip = QLineEdit(socket.gethostbyname(socket.gethostname()))
+        default_ip = str(netifaces.ifaddresses('en0')[netifaces.AF_INET][0]['addr'])
+        # self.ip = QLineEdit(socket.gethostbyname(socket.gethostname()))
+        self.ip = QLineEdit(default_ip)
+        print(type(self.ip))
         box.addWidget(label)
         box.addWidget(self.ip)
 
